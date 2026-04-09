@@ -5,6 +5,9 @@ LDFLAGS = -lpthread
 # Librería del proxy
 LIB_PROXY = libproxyclaves.so
 
+# Librería de claves
+LIB_CLAVES = libclaves.so
+
 # Servidor
 SERVER_EXE = servidor-sock
 
@@ -12,7 +15,11 @@ SERVER_EXE = servidor-sock
 CLIENT1_EXE = cliente1
 CLIENT2_EXE = cliente2
 
-all: $(LIB_PROXY) $(SERVER_EXE) $(CLIENT1_EXE) $(CLIENT2_EXE)
+all: $(LIB_CLAVES) $(LIB_PROXY) $(SERVER_EXE) $(CLIENT1_EXE) $(CLIENT2_EXE)
+
+# Librería dinámica de claves
+$(LIB_CLAVES): claves.o lines.o
+	$(CC) -shared -o $@ $^
 
 # Librería dinámica del proxy
 $(LIB_PROXY): proxy-sock.o lines.o
@@ -49,4 +56,4 @@ lines.o: lines.c
 	$(CC) $(CFLAGS) -c lines.c -o lines.o
 
 clean:
-	rm -f *.o $(LIB_PROXY) $(SERVER_EXE) $(CLIENT1_EXE) $(CLIENT2_EXE)
+	rm -f *.o $(LIB_CLAVES) $(LIB_PROXY) $(SERVER_EXE) $(CLIENT1_EXE) $(CLIENT2_EXE)
