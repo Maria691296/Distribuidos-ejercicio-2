@@ -51,11 +51,17 @@ int destroy() {
     }
 
     /* Enviamos el código de operación (0) + el '\0' (2 bytes) */
-    sendMessage(sd, "0", 2);    // Op 0
+    if (sendMessage(sd, "0", 2) < 0) {    // Op 0
+        close(sd);
+        return -1;
+    }
 
     /* Esperamos la respuesta del servidor (0)*/
     char res[256];
-    readLine(sd, res, 256);
+    if (readLine(sd, res, 256) < 0) {
+        close(sd);
+        return -1;
+    }
 
     /* Cerramos conexión y devolvemos la respuesta */
     close(sd);
@@ -83,9 +89,17 @@ int set_value(char *key, char *value1, int N_value2, float *V_value2, struct Paq
     strcat(buffer, p_tmp);
 
     /* Enviamos el mensaje completo (+ '\0')*/
-    sendMessage(sd, buffer, strlen(buffer) + 1);
+    if (sendMessage(sd, buffer, strlen(buffer) + 1) < 0) {
+        close(sd);
+        return -1;
+    }
+
     char res[256];
-    readLine(sd, res, 256);
+    if (readLine(sd, res, 256) < 0) {
+        close(sd);
+        return -1;
+    }
+
     close(sd);
     return atoi(res);
 }
@@ -182,9 +196,18 @@ int modify_value(char *key, char *value1, int N_value2, float *V_value2, struct 
     strcat(buffer, p_tmp);
 
     /* Enviamos el mensaje completo (+ '\0')*/
-    sendMessage(sd, buffer, strlen(buffer) + 1);
+    if (sendMessage(sd, buffer, strlen(buffer) + 1) < 0) {
+        close(sd);
+        return -1;
+    }
+    
     char res[256];
-    readLine(sd, res, 256);
+    
+    if (readLine(sd, res, 256) < 0) {
+        close(sd);
+        return -1;
+    }
+    
     close(sd);
     return atoi(res);
 }
@@ -202,11 +225,17 @@ int delete_key(char *key) {
     sprintf(buffer, "4;%s", key);   // Op 4
 
     /* Enviamos el mensaje */
-    sendMessage(sd, buffer, strlen(buffer) + 1);
+    if (sendMessage(sd, buffer, strlen(buffer) + 1) < 0) {
+        close(sd);
+        return -1;
+    }
 
     /* Esperamos la respuesta */
     char res[256];
-    readLine(sd, res, 256);
+    if (readLine(sd, res, 256) < 0) {
+        close(sd);
+        return -1;
+    };
 
     /* Cerramos conexión con el servidor y devolvemos la respuesta (0 o -1) */
     close(sd);
@@ -226,11 +255,17 @@ int exist(char *key) {
     sprintf(buffer, "5;%s", key);   // Op 5
 
     /* Enviamos el mensaje */
-    sendMessage(sd, buffer, strlen(buffer) + 1);
+    if (sendMessage(sd, buffer, strlen(buffer) + 1) < 0) {
+        close(sd);
+        return -1;
+    }
 
     /* Esperamos la respuesta */
     char res[256];
-    readLine(sd, res, 256);
+    if (readLine(sd, res, 256) < 0) {
+        close(sd);
+        return -1;
+    }
 
     /* Cerramos conexión con el servidor y devolvemos la respuesta (0 o 1) */
     close(sd);
