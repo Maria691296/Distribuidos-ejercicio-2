@@ -15,7 +15,7 @@ static int conectar_servidor() {
     
     /* Si no se definen las variables de entorno, error */
     if (ip == NULL || port == NULL) {
-        fprintf(stderr, "Error: Variables de entorno no definidas\n");
+        perror("Error: Variables de entorno no definidas");
         return -1;
     }
 

@@ -137,8 +137,17 @@ int main(int argc, char *argv[]) {
     server_addr.sin_port = htons(atoi(argv[1]));
 
     /* Vinculamos el socket con la dirección */
-    bind(sd, (struct sockaddr *)&server_addr, sizeof(server_addr));
-    listen(sd, SOMAXCONN);
+    if (bind(sd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0){
+        perror("Error en bind");
+        close(sd);
+        return -1;
+    }
+
+    if (listen(sd, SOMAXCONN) < 0){
+        perror("Error en listen");
+        close(sd);
+        return -1;
+    }
 
     printf("Servidor listo en puerto %s...\n", argv[1]);
 
@@ -148,7 +157,7 @@ int main(int argc, char *argv[]) {
         socklen_t size = sizeof(client_addr);
         int sc = accept(sd, (struct sockaddr *)&client_addr, &size);
 
-        printf("Ha llegado un cliente.");
+        printf("Ha llegado un cliente.\n");
 
         if (sc == -1){
             continue;
@@ -156,13 +165,23 @@ int main(int argc, char *argv[]) {
 
         pthread_t th;
         int *sc_copy = malloc(sizeof(int));
+
+        if (sc_copy == NULL){
+            perror("Error: Memoria insuficiente");
+            close(sc);
+            continue;
+        }
+
         *sc_copy = sc;
         
         /* Creamos el hilo y lo soltamos para que no ocupe memoria al terminar */
         if (pthread_create(&th, NULL, atender_peticion, sc_copy) != 0) {
+            perror("Error: No se pudo crear el hilo");
             close(sc);
             free(sc_copy);
+            continue;
         }
+        
         pthread_detach(th);
     }
     return 0;
